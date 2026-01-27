@@ -1,0 +1,1 @@
+def score(conf, success): return 0 if conf<50 else ((conf//10) if success else -(conf//10))
