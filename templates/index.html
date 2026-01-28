@@ -1,1 +1,124 @@
 
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>百家 Final v3（路單牆）</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="sticky">
+    <div class="topcard">
+      <div class="label">本局建議</div>
+      <div class="pick">
+        {% if act=="NO" %}
+          <span class="pick-no">不下注</span>
+        {% else %}
+          <span class="pick-go">下 {{ "莊" if act=="B" else "閒" }}</span>
+        {% endif %}
+      </div>
+      <div class="meta">
+
+{% if streak_type %}
+  <div class="streak {{ 'win' if streak_type=='win' else 'loss' }}">
+    {{ streak_count }}{{ '連勝' if streak_type=='win' else '連敗' }}
+  </div>
+{% endif %}
+
+        <div class="conf">{{ conf }}%</div>
+        <div class="score">累積淨分 <b>{{ total }}</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="wall">
+      <div class="panel bead">
+        <div class="ptitle">珠盤</div>
+        <div class="grid beadgrid" style="grid-template-columns: repeat({{roads.bead_cols}}, 18px);">
+          {% for r in range(6) %}
+            {% for c in range(roads.bead_cols) %}
+              {% set v = roads.bead[r][c] %}
+              <div class="dot {{ 'b' if v=='B' else ('p' if v=='P' else ('t' if v=='T' else '')) }}"></div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="panel big">
+        <div class="ptitle">大路</div>
+        <div class="grid biggrid" style="grid-template-columns: repeat({{roads.big_cols}}, 18px);">
+          {% for r in range(6) %}
+            {% for c in range(roads.big_cols) %}
+              {% set cell = roads.big.get((c,r)) %}
+              <div class="dot {% if cell %}{{ 'b' if cell.v=='B' else 'p' }}{% endif %}">
+                {% if cell and cell.ties>0 %}<span class="tie">{{ cell.ties }}</span>{% endif %}
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="panel derived">
+        <div class="stack">
+          <div class="sub">
+            <div class="ptitle smalltitle">大眼</div>
+            <div class="grid subgrid">
+              {% for r in range(6) %}
+                {% for c in range(roads.small_cols) %}
+                  {% set v = roads.bigeye.get((c,r)) %}
+                  <div class="dot {% if v %}{{ 'r' if v=='R' else 'u' }}{% endif %}"></div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+          <div class="sub">
+            <div class="ptitle smalltitle">小路</div>
+            <div class="grid subgrid">
+              {% for r in range(6) %}
+                {% for c in range(roads.small_cols) %}
+                  {% set v = roads.small.get((c,r)) %}
+                  <div class="dot {% if v %}{{ 'r' if v=='R' else 'u' }}{% endif %}"></div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+          <div class="sub">
+            <div class="ptitle smalltitle">曱甴</div>
+            <div class="grid subgrid">
+              {% for r in range(6) %}
+                {% for c in range(roads.small_cols) %}
+                  {% set v = roads.cockroach.get((c,r)) %}
+                  <div class="dot {% if v %}{{ 'r' if v=='R' else 'u' }}{% endif %}"></div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form method="post" class="controls">
+      <button class="btn btn-b" name="act" value="B">莊</button>
+      <button class="btn btn-p" name="act" value="P">閒</button>
+      <button class="btn btn-t" name="act" value="T">和</button>
+      <button class="btn btn-u" name="act" value="UNDO">返回鍵</button>
+      <button class="btn btn-x" name="act" value="RESET">全部刪除</button>
+    </form>
+
+    <div class="log">
+      <div class="ltitle">最近紀錄</div>
+      <div class="lrows">
+        {% for h in hist[-12:] %}
+          <div class="lrow">
+            <span class="tag">{{ "莊" if h[0]=="B" else ("閒" if h[0]=="P" else "不下注") }}</span>
+            <span class="pct">{{ h[1] }}%</span>
+            <span class="delta {{ 'pos' if h[2] >= 0 else 'neg' }}">{{ "+" if h[2] >= 0 else ""}}{{ h[2] }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
