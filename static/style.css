@@ -76,3 +76,7 @@ body{margin:0;background:var(--bg);color:var(--txt);font-family:Arial,"Noto Sans
 }
 .streak.win{color:#a7f3d0;background:rgba(16,185,129,.15)}
 .streak.loss{color:#fecaca;background:rgba(239,68,68,.15)}
+
+
+.wall-2{grid-template-columns: 360px 1fr;}
+@media (max-width: 980px){.wall-2{grid-template-columns: 1fr;}}
