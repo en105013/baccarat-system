@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>百家 Final v3（路單牆）</title>
+  <title>百家（珠盤 + 大路）</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -19,21 +19,25 @@
         {% endif %}
       </div>
       <div class="meta">
-
-{% if streak_type %}
-  <div class="streak {{ 'win' if streak_type=='win' else 'loss' }}">
-    {{ streak_count }}{{ '連勝' if streak_type=='win' else '連敗' }}
-  </div>
-{% endif %}
-
-        <div class="conf">{{ conf }}%</div>
+        <div class="conf">{% if conf %}{{ conf }}%{% else %}--{% endif %}</div>
         <div class="score">累積淨分 <b>{{ total }}</b></div>
+        <div class="streak">
+          {% if streak_len and streak_type %}
+            {% if streak_type=="W" %}
+              <span class="badge win">{{ streak_len }}連勝</span>
+            {% else %}
+              <span class="badge lose">{{ streak_len }}連敗</span>
+            {% endif %}
+          {% else %}
+            <span class="badge neutral">尚無連勝/連敗</span>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
 
   <div class="wrap">
-    <div class="wall">
+    <div class="wall wall-2">
       <div class="panel bead">
         <div class="ptitle">珠盤</div>
         <div class="grid beadgrid" style="grid-template-columns: repeat({{roads.bead_cols}}, 18px);">
@@ -57,44 +61,6 @@
               </div>
             {% endfor %}
           {% endfor %}
-        </div>
-      </div>
-
-      <div class="panel derived">
-        <div class="stack">
-          <div class="sub">
-            <div class="ptitle smalltitle">大眼</div>
-            <div class="grid subgrid">
-              {% for r in range(6) %}
-                {% for c in range(roads.small_cols) %}
-                  {% set v = roads.bigeye.get((c,r)) %}
-                  <div class="dot {% if v %}{{ 'r' if v=='R' else 'u' }}{% endif %}"></div>
-                {% endfor %}
-              {% endfor %}
-            </div>
-          </div>
-          <div class="sub">
-            <div class="ptitle smalltitle">小路</div>
-            <div class="grid subgrid">
-              {% for r in range(6) %}
-                {% for c in range(roads.small_cols) %}
-                  {% set v = roads.small.get((c,r)) %}
-                  <div class="dot {% if v %}{{ 'r' if v=='R' else 'u' }}{% endif %}"></div>
-                {% endfor %}
-              {% endfor %}
-            </div>
-          </div>
-          <div class="sub">
-            <div class="ptitle smalltitle">曱甴</div>
-            <div class="grid subgrid">
-              {% for r in range(6) %}
-                {% for c in range(roads.small_cols) %}
-                  {% set v = roads.cockroach.get((c,r)) %}
-                  <div class="dot {% if v %}{{ 'r' if v=='R' else 'u' }}{% endif %}"></div>
-                {% endfor %}
-              {% endfor %}
-            </div>
-          </div>
         </div>
       </div>
     </div>
